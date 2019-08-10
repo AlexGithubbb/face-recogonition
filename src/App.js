@@ -34,7 +34,30 @@ class App extends Component {
     // showSignIn: true
     route: 'signin',
     isSignedIn: false,
+    user: {
+      id: '',
+      name: '',
+      email: '',
+      entries: 0,
+      joined: ''
+    }
   };
+
+  loadUser = (data) => {
+    this.setState({ user: {
+      id: data.id,
+      name: data.name,
+      email: data.email,
+      entries: data.entries,
+      joined: data.joined
+    }
+    });
+  };
+  componentDidMount() {
+    fetch('http://localhost:3000/')
+      .then(response => response.json())
+      .then(console.log);
+  }
 
   calculateFaceLocation = data => {
     console.log(data);
@@ -58,7 +81,7 @@ class App extends Component {
     this.setState({ input: e.target.value });
   };
 
-  onButtonClickHandler = () => {
+  onPictureSubmit = () => {
     this.setState({ imgUrl: this.state.input });
     app.models
       .predict(
@@ -68,6 +91,25 @@ class App extends Component {
         this.state.input
       )
       .then(response => {
+        if(response){
+          fetch('http://localhost:3000/image', {
+            method: 'put',
+            headers: { 'Content-type': 'Application/json' },
+            body: JSON.stringify({
+              id: this.state.user.id
+          })
+        })
+        .then(res => res.json())
+        .then(entries => {
+          // this.setState({
+          //   user: {
+          //     entries: entries
+          //   }
+          // })
+          this.setState(
+            Object.assign(this.state.user, {entries: entries}))
+        })
+      }
         const data =
           response.outputs[0].data.regions[0].region_info.bounding_box;
         this.displayFaceBox(this.calculateFaceLocation(data));
@@ -75,40 +117,43 @@ class App extends Component {
       .catch(err => console.log('oooppps, error!'));
   };
 
-
-  onRouteChange = (route) => {
+  onRouteChange = route => {
     if (route === 'signin') {
-      this.setState({isSignedIn: false})
-    }else if(route === 'home'){
-      this.setState({ isSignedIn: true})
+      this.setState({ isSignedIn: false });
+    } else if (route === 'home') {
+      this.setState({ isSignedIn: true });
     }
-    this.setState({route})
-  }
+    this.setState({ route });
+  };
   render() {
-    const {input, isSignedIn, imgUrl, box, route} = this.state;
+    const { input, isSignedIn, imgUrl, box, route } = this.state;
     return (
       <div className='App'>
         <Particles className='particles' params={particleOption} />
-        <Navigation onRouteChange={this.onRouteChange} isSignedIn = {isSignedIn}/>
-        {route === 'home' ?
+        <Navigation
+          onRouteChange={this.onRouteChange}
+          isSignedIn={isSignedIn}
+        />
+        {route === 'home' ? (
           <div>
             <Logo />
-            <Rank />
+            <Rank name={this.state.user.name} entries={this.state.user.entries} />
             <ImageLinkForm
               input={input}
               onInputChange={this.inputChangeHandler}
-              onButtonClick={this.onButtonClickHandler}
+              onButtonClick={this.onPictureSubmit}
             />
-            <FaceRecgonition
-              box={box}
-              imageUrl={imgUrl}
-            />
+            <FaceRecgonition box={box} imageUrl={imgUrl} />
           </div>
-           : (route === 'signin' ?
-              <SignIn onRouteChange={this.onRouteChange} />
-              : <Register onRouteChange={this.onRouteChange}/>
-              )
-          }
+        ) : route === 'signin' ? (
+          <SignIn onRouteChange={this.onRouteChange}
+          loadUser ={this.loadUser} />
+        ) : (
+          <Register
+            onRouteChange={this.onRouteChange}
+            loadUser={this.loadUser}
+          />
+        )}
       </div>
     );
   }
