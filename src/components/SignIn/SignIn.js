@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Form from '../Form/Form';
 // onRouteChange
 class SignIn extends Component {
   state = {
@@ -28,7 +29,7 @@ class SignIn extends Component {
           this.props.loadUser(user);
           this.props.onRouteChange('home');
         } else {
-          alert('username or passwrod is not ok');
+          alert(user);
         }
       });
   };
@@ -40,32 +41,14 @@ class SignIn extends Component {
           <div className='measure'>
             <fieldset id='sign_up' className='ba b--transparent ph0 mh0'>
               <legend className='f1 fw6 ph0 mh0'>Sign In</legend>
-              <div className='mt3'>
-                <label className='db fw6 lh-copy f6' htmlFor='email-address'>
-                  Email
-                </label>
-                <input
-                  className='pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100'
-                  type='email'
-                  name='email-address'
-                  id='email-address'
-                  onChange={this.onEmailChange}
-                />
-              </div>
-              <div className='mv3'>
-                <label className='db fw6 lh-copy f6' htmlFor='password'>
-                  Password
-                </label>
-                <input
-                  className='b pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100'
-                  type='password'
-                  name='password'
-                  id='password'
-                  onChange={this.onPasswordChange}
-                />
-              </div>
+              <Form label='Email' type='email' onChange={this.onEmailChange} />
+              <Form
+                label='Password'
+                type='password'
+                onChange={this.onPasswordChange}
+              />
             </fieldset>
-            <div className=''>
+            <div style={{ marginTop: "10px" }}>
               <input
                 className='b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib'
                 type='submit'

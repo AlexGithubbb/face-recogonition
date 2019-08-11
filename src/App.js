@@ -25,23 +25,24 @@ const particleOption = {
     }
   }
 };
+const initialState = {
+  input: '',
+  imgUrl: '',
+  box: {},
+  // showSignIn: true
+  route: 'signin',
+  isSignedIn: false,
+  user: {
+    id: '',
+    name: '',
+    email: '',
+    entries: 0,
+    joined: ''
+  }
+}
 
 class App extends Component {
-  state = {
-    input: '',
-    imgUrl: '',
-    box: {},
-    // showSignIn: true
-    route: 'signin',
-    isSignedIn: false,
-    user: {
-      id: '',
-      name: '',
-      email: '',
-      entries: 0,
-      joined: ''
-    }
-  };
+  state = initialState;
 
   loadUser = (data) => {
     this.setState({ user: {
@@ -60,7 +61,7 @@ class App extends Component {
   }
 
   calculateFaceLocation = data => {
-    console.log(data);
+    // console.log(data);
     const image = document.getElementById('inputImage');
     const width = Number(image.width);
     const height = Number(image.height);
@@ -94,7 +95,7 @@ class App extends Component {
         if(response){
           fetch('http://localhost:3000/image', {
             method: 'put',
-            headers: { 'Content-type': 'Application/json' },
+            headers: { 'Content-type': 'application/json' },
             body: JSON.stringify({
               id: this.state.user.id
           })
@@ -109,6 +110,7 @@ class App extends Component {
           this.setState(
             Object.assign(this.state.user, {entries: entries}))
         })
+        .catch(err => console.log(err))
       }
         const data =
           response.outputs[0].data.regions[0].region_info.bounding_box;
@@ -119,7 +121,8 @@ class App extends Component {
 
   onRouteChange = route => {
     if (route === 'signin') {
-      this.setState({ isSignedIn: false });
+      // this.setState({ isSignedIn: false });
+      this.setState(initialState);
     } else if (route === 'home') {
       this.setState({ isSignedIn: true });
     }
