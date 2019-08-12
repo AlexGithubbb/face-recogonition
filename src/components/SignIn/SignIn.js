@@ -15,9 +15,10 @@ class SignIn extends Component {
   };
 
   onSubmitSignIn = () => {
+    // fetch('https://desolate-depths-14393.herokuapp.com/signin', {
     fetch('http://localhost:3000/signin', {
       method: 'post',
-      headers: { 'Content-type': 'Application/json' },
+      headers: { 'Content-type': 'application/json' },
       body: JSON.stringify({
         email: this.state.signInEmail,
         password: this.state.signInPassword

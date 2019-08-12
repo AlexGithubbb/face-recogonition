@@ -8,11 +8,11 @@ import SignIn from './components/SignIn/SignIn';
 import Register from './components/Register/Register';
 import Rank from './components/Rank/Rank';
 import Particles from 'react-particles-js';
-import Clarifai from 'clarifai';
 
-const app = new Clarifai.App({
-  apiKey: 'ca84e148be6e4a74ac5de36d793d3b28'
-});
+// for security reason, move it to server
+// const app = new Clarifai.App({
+//   apiKey: 'ca84e148be6e4a74ac5de36d793d3b28'
+// });
 
 const particleOption = {
   particles: {
@@ -55,6 +55,7 @@ class App extends Component {
     });
   };
   componentDidMount() {
+    // fetch('https://desolate-depths-14393.herokuapp.com')
     fetch('http://localhost:3000/')
       .then(response => response.json())
       .then(console.log);
@@ -84,15 +85,17 @@ class App extends Component {
 
   onPictureSubmit = () => {
     this.setState({ imgUrl: this.state.input });
-    app.models
-      .predict(
-        Clarifai.FACE_DETECT_MODEL,
-        // URL
-        // "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80"
-        this.state.input
-      )
+    // fetch('https://desolate-depths-14393.herokuapp.com/imageurl', {
+    fetch('http://localhost:3000/imageurl', {
+      method: 'post',
+      headers: { 'Content-type': 'application/json' },
+      body: JSON.stringify({
+        input: this.state.input
+      })
+    })
+      .then(res => res.json())
       .then(response => {
-        if(response){
+        if(response.outputs){
           fetch('http://localhost:3000/image', {
             method: 'put',
             headers: { 'Content-type': 'application/json' },
@@ -111,6 +114,8 @@ class App extends Component {
             Object.assign(this.state.user, {entries: entries}))
         })
         .catch(err => console.log(err))
+      }else{
+        alert('this image doesn\'t work')
       }
         const data =
           response.outputs[0].data.regions[0].region_info.bounding_box;
